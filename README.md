@@ -1,3 +1,5 @@
+# Support  Visual Studio Commuity 2022
+  - 2022-08-07
 # Visual Studio 2015/2017 file open tool
 
 Finds an VS instance containing a solution with the specified file to open it at the specified line.
