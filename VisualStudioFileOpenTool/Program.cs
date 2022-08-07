@@ -120,10 +120,15 @@
                 SetForegroundWindow(new IntPtr(foundDte.MainWindow.HWnd));
 
                 // open file
-                var window = foundDte.ItemOperations.OpenFile(filePath);
-                // and move caret to the required file line
-                var textSelection = (TextSelection)window.Selection;
-                textSelection.MoveToLineAndOffset(fileline, 1);
+                
+                // var window = foundDte.ItemOperations.OpenFile(filePath);
+                foundDte.ItemOperations.OpenFile(filePath,EnvDTE.Constants.vsViewKindTextView);
+                // // and move caret to the required file line
+                // var textSelection = (TextSelection)window.Selection;
+                // textSelection.MoveToLineAndOffset(fileline, 1);
+                
+                var textSelection=(EnvDTE.TextSelection)foundDte.ActiveDocument.Selection;
+                textSelection.GotoLine(fileline, true);
             }
             catch (Exception ex)
             {
