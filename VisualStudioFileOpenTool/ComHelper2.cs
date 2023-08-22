@@ -1,4 +1,4 @@
-﻿namespace VisualStudioFileOpenTool
+namespace VisualStudioFileOpenTool
 {
     #region
 
@@ -6,13 +6,15 @@
     using System.Collections;
     using System.Runtime.InteropServices;
     using EnvDTE;
+    using System.Runtime.InteropServices.ComTypes;
 
+   // warning CS0618: “UCOMIBindCtx”已过时:“Use System.Runtime.InteropServices.ComTypes.IBindCtx instead.http://go.microsoft.com/fwlink/?linkid=14202”
     #endregion
-
     public class ComHelper2
     {
         [DllImport("ole32.dll")]
-        public static extern int CreateBindCtx(int reserved, out UCOMIBindCtx ppbc);
+        // public static extern int CreateBindCtx(int reserved, out UCOMIBindCtx ppbc);
+        public static extern int CreateBindCtx(int reserved, out IBindCtx ppbc);
 
         /// <summary>
         /// Get a table of the currently running instances of the Visual Studio .NET IDE.
@@ -49,8 +51,10 @@
             return GetIDEInstances().Values;
         }
 
+        // warning CS0618: “UCOMIRunningObjectTable”已过时:“Use System.Runtime.InteropServices.ComTypes.IRunningObjectTable instead. http://go.microsoft.com/fwlink/?linkid=14202”        
         [DllImport("ole32.dll")]
-        public static extern int GetRunningObjectTable(int reserved, out UCOMIRunningObjectTable prot);
+        // public static extern int GetRunningObjectTable(int reserved, out UCOMIRunningObjectTable prot);
+        public static extern int GetRunningObjectTable(int reserved, out IRunningObjectTable prot);
 
         /// <summary>
         /// Get a snapshot of the running object table (ROT).
@@ -61,18 +65,28 @@
         {
             var result = new Hashtable();
 
-            int numFetched;
-            UCOMIRunningObjectTable runningObjectTable;
-            UCOMIEnumMoniker monikerEnumerator;
-            var monikers = new UCOMIMoniker[1];
+       //     int numFetched;
+            // UCOMIRunningObjectTable runningObjectTable;
+            IRunningObjectTable runningObjectTable;
+// warning CS0618: “UCOMIEnumMoniker”已过时:“Use System.Runtime.InteropServices.ComTypes.IEnumMoniker instead. http://go.microsoft.com/fwlink/?linkid=14202”            
+            // UCOMIEnumMoniker monikerEnumerator;
+            IEnumMoniker monikerEnumerator;
+// warning CS0618: “UCOMIMoniker”已过时:“Use System.Runtime.InteropServices.ComTypes.IMoniker instead. http://go.microsoft.com/fwlink/?linkid=14202”            
+            // var monikers = new UCOMIMoniker[1];
+            var monikers = new IMoniker[1];
 
             GetRunningObjectTable(0, out runningObjectTable);
             runningObjectTable.EnumRunning(out monikerEnumerator);
             monikerEnumerator.Reset();
-
-            while (monikerEnumerator.Next(1, monikers, out numFetched) == 0)
+            
+            
+          //  IntPtr iptr = new IntPtr(numFetched);
+            IntPtr fetched = IntPtr.Zero;
+            // while (monikerEnumerator.Next(1, monikers, out numFetched) == 0)
+            while (monikerEnumerator.Next(1, monikers, fetched) == 0)
             {
-                UCOMIBindCtx ctx;
+                // UCOMIBindCtx ctx;
+                IBindCtx ctx;
                 CreateBindCtx(0, out ctx);
 
                 string runningObjectName;
